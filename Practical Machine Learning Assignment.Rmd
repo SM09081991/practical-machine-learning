@@ -1,0 +1,109 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+---
+title: "Practical Machine Learning"
+
+#Loading the Data
+
+library(caret) 
+library(ggplot2)
+library(lattice)
+library(rpart)
+library(rpart.plot)
+library(randomForest)
+
+-------training data--------
+
+trainURL = "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"  
+training = read.csv(url(trainUrl), na.strings = c("NA", "", "#DIV0!"))
+
+-------testing data----------
+
+testURL = "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+
+testing = read.csv(url(testUrl), na.strings = c("NA", "", "#DIV0!"))
+
+
+#Pre-Processing/Cleaning data
+
+-------Remove variables with NA values----------
+
+training = training[,colSums(is.na(training)) == 0]
+
+testing = testing[,colSums(is.na(testing)) == 0]
+
+head(colnames(training), 10)
+
+head(colnames(testing), 10)
+
+-------Removing non-predictor columns-------
+
+training = training[,-c(1:7)]
+
+testing = testing[,-c(1:7)]
+
+# Cross-validation
+
+-------Splitting the data---------
+
+set.seed(12345)
+
+inTrain = createDataPartition(training$classe, p=0.6, list=FALSE)
+
+trainingCV = training[inTrain,]
+
+testingCV = training[-inTrain,]
+
+dim(trainingCV)
+
+dim(testingCV)
+
+-----plots--------
+
+qplot(accel_arm_x, accel_arm_y, col=classe, data=trainingCV)
+
+qplot(accel_forearm_x, accel_forearm_y, col=classe, data=trainingCV)
+
+qplot(accel_dumbbell_x, accel_dumbbell_y, col=classe, data=trainingCV)
+
+qplot(accel_belt_x, accel_belt_y, col=classe, data=trainingCV)
+
+
+#Prediction models
+
+--------Classification Tree model----------
+
+modelTree = rpart(classe ~ ., data=trainingCV, method="class")
+
+predictionTree = predict(modelTree, testingCV, type="class")
+
+Tree = confusionMatrix(predictionTree, testingCV$classe)
+
+Tree
+
+rpart.plot(modelTree)
+
+
+-----------Random forest model-------------
+
+modelRF = randomForest(classe ~ ., data=trainingCV, method="class")
+
+predictionRF = predict(modelRF, testingCV, type="class")
+
+RF = confusionMatrix(predictionRF, testingCV$classe)
+
+RF
+
+CV = testingCV
+
+CV\$Pred = testingCV\$classe == predictionRF
+
+qplot(accel_forearm_x, accel_forearm_y, col=Pred, data=CV)
+ 
+# Testing the model to predict 20 different test cases
+
+Predict = predict(modelRF, testing)
+
+Predict
