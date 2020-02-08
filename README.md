@@ -15,14 +15,17 @@ library(randomForest)
 -------training data------------------------------------------------
 
 trainURL = "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"  
+
 training = read.csv(url(trainUrl), na.strings = c("NA", "", "#DIV0!"))
 
 -------testing data------------------------------------------------------------
 
 testURL = "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+
 testing = read.csv(url(testUrl), na.strings = c("NA", "", "#DIV0!"))
 
 Task 2: Clean the data to remove Na values and keep the predictors to be  used for building the model
+
 #Pre-Processing/Cleaning data
 
 -------Remove variables with NA values----------
@@ -45,17 +48,25 @@ Task 3: Since we have training dataset with high number of samples, I decided to
 -------Splitting the data--------------------------------------------------------------------------------------
 
 set.seed(12345)
+
 inTrain = createDataPartition(training$classe, p=0.6, list=FALSE)
+
 trainingCV = training[inTrain,]
+
 testingCV = training[-inTrain,]
+
 dim(trainingCV)
+
 dim(testingCV)
 
 -----Plots----------------------------------------------------------------------------------------------------------
 
 qplot(accel_arm_x, accel_arm_y, col=classe, data=trainingCV)
+
 qplot(accel_forearm_x, accel_forearm_y, col=classe, data=trainingCV)
+
 qplot(accel_dumbbell_x, accel_dumbbell_y, col=classe, data=trainingCV)
+
 qplot(accel_belt_x, accel_belt_y, col=classe, data=trainingCV) 
 
 Task 4: I tested two models Decision Tree and Random forest, model with highest accuracy was chose as final prediction model 
@@ -65,8 +76,11 @@ Task 4: I tested two models Decision Tree and Random forest, model with highest 
 --------Classification Tree model----------
 
 modelTree = rpart(classe ~ ., data=trainingCV, method="class")
+
 predictionTree = predict(modelTree, testingCV, type="class")
+
 Tree = confusionMatrix(predictionTree, testingCV$classe)
+
 Tree
 
 Confusion Matrix and Statistics
@@ -108,8 +122,11 @@ rpart.plot(modelTree)
 -----------Random forest model------------------------------------------------------------------------------------
 
 modelRF = randomForest(classe ~ ., data=trainingCV, method="class")
+
 predictionRF = predict(modelRF, testingCV, type="class")
+
 RF = confusionMatrix(predictionRF, testingCV$classe)
+
 RF
 
 Confusion Matrix and Statistics
@@ -146,15 +163,18 @@ Detection Prevalence   0.2846   0.1940   0.1740   0.1644   0.1830
 Balanced Accuracy      0.9990   0.9981   0.9962   0.9978   0.9979
 
 CV <- testingCV
+
 CV$Pred = testingCV$classe == predictionRF
+
 qplot(accel_forearm_x, accel_forearm_y, col=Pred, data=CV)
-Low failure points due to high dagree of accuaracy 
 
 Result: Comparing two models Random forest appear to perform well (accuracy=0.9967) as compare to Decision tree (accuracy=0.7466). Therefore, Random forest model was used for final prediction. 
 
 # Testing the model to predict 20 different test cases
 Predict = predict(modelRF, testing)
+
 Predict
+
 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 
  B  A  B  A  A  E  D  B  A  A  B  C  B  A  E  E  A  B  B  B 
 Levels: A B C D E
