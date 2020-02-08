@@ -13,16 +13,20 @@ library(rpart.plot)
 library(randomForest)
 
 -------training data------------------------------------------------
+
 trainURL = "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"  
 training = read.csv(url(trainUrl), na.strings = c("NA", "", "#DIV0!"))
 
 -------testing data------------------------------------------------------------
+
 testURL = "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
 testing = read.csv(url(testUrl), na.strings = c("NA", "", "#DIV0!"))
 
 Task 2: Clean the data to remove Na values and keep the predictors to be  used for building the model
 #Pre-Processing/Cleaning data
+
 -------Remove variables with NA values----------
+
 training = training[,colSums(is.na(training)) == 0]
 testing = testing[,colSums(is.na(testing)) == 0]
 
@@ -30,20 +34,25 @@ head(colnames(training), 10)
 head(colnames(testing), 10)
 
 -------Removing non-predictor columns-----------------------------------------------------------------------
+
 training = training[,-c(1:7)]
 testing = testing[,-c(1:7)]
 
 Task 3: Since we have training dataset with high number of samples, I decided to  split my training datsets into 60percent of training and 40percent of testing set to allow for cross-validation. The most accurate model will be choosen and tested on the original Testing dataset. 
 
 # Cross-validation
+
 -------Splitting the data--------------------------------------------------------------------------------------
+
 set.seed(12345)
 inTrain = createDataPartition(training$classe, p=0.6, list=FALSE)
 trainingCV = training[inTrain,]
 testingCV = training[-inTrain,]
 dim(trainingCV)
 dim(testingCV)
+
 -----Plots----------------------------------------------------------------------------------------------------------
+
 qplot(accel_arm_x, accel_arm_y, col=classe, data=trainingCV)
 qplot(accel_forearm_x, accel_forearm_y, col=classe, data=trainingCV)
 qplot(accel_dumbbell_x, accel_dumbbell_y, col=classe, data=trainingCV)
@@ -52,11 +61,14 @@ qplot(accel_belt_x, accel_belt_y, col=classe, data=trainingCV)
 Task 4: I tested two models Decision Tree and Random forest, model with highest accuracy was chose as final prediction model 
 
 #Prediction models
+
 --------Classification Tree model----------
-modelTree <- rpart(classe ~ ., data=trainingCV, method="class")
-predictionTree <- predict(modelTree, testingCV, type="class")
-Tree <- confusionMatrix(predictionTree, testingCV$classe)
+
+modelTree = rpart(classe ~ ., data=trainingCV, method="class")
+predictionTree = predict(modelTree, testingCV, type="class")
+Tree = confusionMatrix(predictionTree, testingCV$classe)
 Tree
+
 Confusion Matrix and Statistics
 
           Reference
@@ -93,11 +105,13 @@ Balanced Accuracy      0.9087   0.7600   0.8583   0.7992   0.8414
 rpart.plot(modelTree)
  
 
------------Random forest model-----------------------------------------------------------------------
+-----------Random forest model------------------------------------------------------------------------------------
+
 modelRF = randomForest(classe ~ ., data=trainingCV, method="class")
 predictionRF = predict(modelRF, testingCV, type="class")
 RF = confusionMatrix(predictionRF, testingCV$classe)
 RF
+
 Confusion Matrix and Statistics
 
           Reference
