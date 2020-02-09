@@ -116,6 +116,8 @@ Detection Rate         0.2543   0.1134   0.1394   0.1071   0.1324
 Detection Prevalence   0.3089   0.1670   0.2080   0.1528   0.1633
 Balanced Accuracy      0.9087   0.7600   0.8583   0.7992   0.8414
 
+out-of-sample error=0.2554
+
 rpart.plot(modelTree)
  
 
@@ -162,13 +164,15 @@ Detection Rate         0.2841   0.1930   0.1732   0.1634   0.1830
 Detection Prevalence   0.2846   0.1940   0.1740   0.1644   0.1830
 Balanced Accuracy      0.9990   0.9981   0.9962   0.9978   0.9979
 
+out-of-sample error=0.0033
+
 CV <- testingCV
 
 CV$Pred = testingCV$classe == predictionRF
 
 qplot(accel_forearm_x, accel_forearm_y, col=Pred, data=CV)
 
-Result: Comparing two models Random forest appear to perform well (accuracy=0.9967) as compare to Decision tree (accuracy=0.7466). Therefore, Random forest model was used for final prediction. 
+Result: Comparing two models Random forest appear to perform well (accuracy=0.9967, out-of-sample error=0.0033) as compare to Decision tree (accuracy=0.7466,out-of-sample error=0.2554). Therefore, Random forest model was used for final prediction. 
 
 # Testing the model to predict 20 different test cases
 Predict = predict(modelRF, testing)
