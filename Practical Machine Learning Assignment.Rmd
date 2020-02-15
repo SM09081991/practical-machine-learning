@@ -1,10 +1,6 @@
----
-output:
-  html_document: default
-  pdf_document: default
----
 title: "Practical Machine Learning"
 
+Task 1: To load the data
 #Loading the Data
 
 library(caret) 
@@ -25,7 +21,7 @@ testURL = "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
 
 testing = read.csv(url(testUrl), na.strings = c("NA", "", "#DIV0!"))
 
-
+Task 2: Clean the data to remove Na values and keep the predictors to be  used for building the model
 #Pre-Processing/Cleaning data
 
 -------Remove variables with NA values----------
@@ -44,9 +40,8 @@ training = training[,-c(1:7)]
 
 testing = testing[,-c(1:7)]
 
+Task 3: Since we have training dataset with high number of samples, I decided to  split my training datsets into 60percent of training and 40percent of testing set to allow for cross-validation. The most accurate model will be choosen and tested on the original Testing dataset. 
 # Cross-validation
-
-Since we have training dataset with high number of samples, I decided to  split my training datsets into 60percent of training and 40percent of testing set to allow for cross-validation. The most accurate model will be choosen and tested on the original Testing dataset. 
 
 -------Splitting the data---------
 
@@ -72,10 +67,8 @@ qplot(accel_dumbbell_x, accel_dumbbell_y, col=classe, data=trainingCV)
 
 qplot(accel_belt_x, accel_belt_y, col=classe, data=trainingCV)
 
-
+Task 4: I tested two models Decision Tree and Random forest, model with highest accuracy was chose as final prediction model 
 #Prediction models
-
-I tested two models Decision Tree and Random forest, model with highest accuracy was chose as final prediction model 
 
 --------Classification Tree model------------------------------------------------------------------------
 
