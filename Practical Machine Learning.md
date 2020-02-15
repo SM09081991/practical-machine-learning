@@ -16,13 +16,13 @@ library(randomForest)
 
 trainURL = "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"  
 
-training = read.csv(url(trainUrl), na.strings = c("NA", "", "#DIV0!"))
+training = read.csv(url(trainURL), na.strings = c("NA", "", "#DIV0!"))
 
 -------testing data------------------------------------------------------------
 
 testURL = "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
 
-testing = read.csv(url(testUrl), na.strings = c("NA", "", "#DIV0!"))
+testing = read.csv(url(testURL), na.strings = c("NA", "", "#DIV0!"))
 
 Task 2: Clean the data to remove Na values and keep the predictors to be  used for building the model
 
