@@ -11,7 +11,7 @@ here: http://groupware.les.inf.puc-rio.br/har (see the section on the Weight Lif
 
 
 Expected Output
-The goal of your project is to predict the manner in which they did the exercise. 
+The goal of your project is to predict the manner in which participants did the exercise. 
 
 Task 1: To load the datasets and packages required to perform analysis and plot the outcomes
 
