@@ -1,59 +1,63 @@
+<html>
+
 <title>Practical Machine Learning assignment</title>
+</head>
+
 <body>The goal of this assigment is to build a prediction model to predict the manner in which the
 participants in this study perform their exercises. The data for this project come from this 
 source: http://groupware.les.inf.puc-rio.br/har. 
 
-<div class="chunk" id="unnamed-chunk-1"><div class="rcode"><div class="source"><pre class="knitr r"><span class="hl com">#Loading the Data</span>
-<span class="hl kwd">library</span>(caret) 
-<span class="hl kwd">library</span>(ggplot2)
-<span class="hl kwd">library</span>(lattice)
-<span class="hl kwd">library</span>(rpart)
-<span class="hl kwd">library</span>(rpart.plot)
-<span class="hl kwd">library</span>(randomForest)
+#Loading the Data
+library(caret) 
+library(ggplot2)
+library(lattice)
+library(rpart)
+library(rpart.plot)
+library(randomForest)
 
 -------training data------------------------------------------------
-trainURL = <span class="hl str">&quot;http://d396qusza40orc.cloudfront.net/predmachlearn/pml-trainin.csv&quot;</span>  
-training = <span class="hl kwd">read.csv</span>(<span class="hl kwd">url</span>(trainUrl), na.strings = <span class="hl kwd">c</span>(<span class="hl str">&quot;<span class="hl kwa">NA</span>&quot;</span>, <span class="hl str">&quot;&quot;</span>, <span class="hl str">&quot;#DIV0!&quot;</span>))
+trainURL = "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-trainin.csv"  
+training = read.csv(url(trainUrl), na.strings = c("NA", "", "#DIV0!"))
 
 -------testing data------------------------------------------------------------
-testURL = <span class="hl str">&quot;https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv&quot;</span>
-testing = <span class="hl kwd">read.csv</span>(<span class="hl kwd">url</span>(testUrl), na.strings = <span class="hl kwd">c</span>(<span class="hl str">&quot;<span class="hl kwa">NA</span>&quot;</span>, <span class="hl str">&quot;&quot;</span>, <span class="hl str">&quot;#DIV0!&quot;</span>))
+testURL = "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+testing = read.csv(url(testUrl), na.strings = c("NA", "", "#DIV0!"))
 
-<span class="hl com">#Pre-Processing/Cleaning data</span>
--------Remove variables with <span class="hl kwa">NA</span> values----------
-training = training[,<span class="hl kwd">colSums</span>(<span class="hl kwd">is.na</span>(training)) == 0]
-testing = testing[,<span class="hl kwd">colSums</span>(<span class="hl kwd">is.na</span>(testing)) == 0]
+#Pre-Processing/Cleaning data
+-------Remove variables with NA values----------
+training = training[,colSums(is.na(training)) == 0]
+testing = testing[,colSums(is.na(testing)) == 0]
 
-<span class="hl kwd">head</span>(<span class="hl kwd">colnames</span>(training), 10)
-<span class="hl kwd">head</span>(<span class="hl kwd">colnames</span>(testing), 10)
+head(colnames(training), 10)
+head(colnames(testing), 10)
 
 -------Removing non-predictor columns--------------------------------------
-training = training[,-<span class="hl kwd">c</span>(1:7)]
-testing = testing[,-<span class="hl kwd">c</span>(1:7)]
+training = training[,-c(1:7)]
+testing = testing[,-c(1:7)]
 
-Since we have training dataset with high number of samples, I decided to  split my training datsets into 60percent of training and 40percent of testing set to allow <span class="hl kwa">for</span> cross-validation. The most accurate model will be choosen and tested on the original Testing dataset. 
+Since we have training dataset with high number of samples, I decided to  split my training datsets into 60percent of training and 40percent of testing set to allow for cross-validation. The most accurate model will be choosen and tested on the original Testing dataset. 
 
-<span class="hl com"># Cross-validation</span>
+# Cross-validation
 -------Splitting the data--------------------------------------------------------------------------------------
-<span class="hl kwd">set.seed</span>(12345)
-inTrain = <span class="hl kwd">createDataPartition</span>(training$classe, p=0.6, list=<span class="hl kwa">FALSE</span>)
+set.seed(12345)
+inTrain = createDataPartition(training$classe, p=0.6, list=FALSE)
 trainingCV = training[inTrain,]
 testingCV = training[-inTrain,]
-<span class="hl kwd">dim</span>(trainingCV)
-<span class="hl kwd">dim</span>(testingCV)
+dim(trainingCV)
+dim(testingCV)
 -----Plots----------------------------------------------------------------------------------------------------------
-<span class="hl kwd">qplot</span>(accel_arm_x, accel_arm_y, col=classe, data=trainingCV)
-<span class="hl kwd">qplot</span>(accel_forearm_x, accel_forearm_y, col=classe, data=trainingCV)
-<span class="hl kwd">qplot</span>(accel_dumbbell_x, accel_dumbbell_y, col=classe, data=trainingCV)
-<span class="hl kwd">qplot</span>(accel_belt_x, accel_belt_y, col=classe, data=trainingCV)
+qplot(accel_arm_x, accel_arm_y, col=classe, data=trainingCV)
+qplot(accel_forearm_x, accel_forearm_y, col=classe, data=trainingCV)
+qplot(accel_dumbbell_x, accel_dumbbell_y, col=classe, data=trainingCV)
+qplot(accel_belt_x, accel_belt_y, col=classe, data=trainingCV)
 
 I tested two models Decision Tree and Random forest, model with highest accuracy was chose as final prediction model 
 
-<span class="hl com">#Prediction models</span>
+#Prediction models
 --------Classification Tree model----------
-modelTree &lt;- <span class="hl kwd">rpart</span>(classe ~ ., data=trainingCV, method=<span class="hl str">&quot;class&quot;</span>)
-predictionTree &lt;- <span class="hl kwd">predict</span>(modelTree, testingCV, type=<span class="hl str">&quot;class&quot;</span>)
-Tree &lt;- <span class="hl kwd">confusionMatrix</span>(predictionTree, testingCV$classe)
+modelTree <- rpart(classe ~ ., data=trainingCV, method="class")
+predictionTree <- predict(modelTree, testingCV, type="class")
+Tree <- confusionMatrix(predictionTree, testingCV$classe)
 Tree
 Confusion Matrix and Statistics
 
@@ -70,11 +74,11 @@ Overall Statistics
                Accuracy : 0.7466          
                  95% CI : (0.7368, 0.7562)
     No Information Rate : 0.2845          
-    P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+    P-Value [Acc > NIR] : < 2.2e-16       
                                           
                   Kappa : 0.6787          
                                           
- Mcnemar's Test P-Value : &lt; 2.2e-16       
+ Mcnemar's Test P-Value : < 2.2e-16       
 
 Statistics by Class:
 
@@ -88,12 +92,13 @@ Detection Rate         0.2543   0.1134   0.1394   0.1071   0.1324
 Detection Prevalence   0.3089   0.1670   0.2080   0.1528   0.1633
 Balanced Accuracy      0.9087   0.7600   0.8583   0.7992   0.8414
 
-<span class="hl kwd">rpart.plot</span>(modelTree)
+out of sample error rate=0.2534	
+rpart.plot(modelTree)
 
 -----------Random forest model-----------------------------------------------------------------------
-modelRF = <span class="hl kwd">randomForest</span>(classe ~ ., data=trainingCV, method=<span class="hl str">&quot;class&quot;</span>)
-predictionRF = <span class="hl kwd">predict</span>(modelRF, testingCV, type=<span class="hl str">&quot;class&quot;</span>)
-RF = <span class="hl kwd">confusionMatrix</span>(predictionRF, testingCV$classe)
+modelRF = randomForest(classe ~ ., data=trainingCV, method="class")
+predictionRF = predict(modelRF, testingCV, type="class")
+RF = confusionMatrix(predictionRF, testingCV$classe)
 RF
 Confusion Matrix and Statistics
 
@@ -110,11 +115,11 @@ Overall Statistics
                Accuracy : 0.9967          
                  95% CI : (0.9951, 0.9978)
     No Information Rate : 0.2845          
-    P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+    P-Value [Acc > NIR] : < 2.2e-16       
                                           
                   Kappa : 0.9958          
                                           
- Mcnemar's Test P-Value : <span class="hl kwa">NA</span>              
+ Mcnemar's Test P-Value : NA              
 
 Statistics by Class:
 
@@ -128,23 +133,18 @@ Detection Rate         0.2841   0.1930   0.1732   0.1634   0.1830
 Detection Prevalence   0.2846   0.1940   0.1740   0.1644   0.1830
 Balanced Accuracy      0.9990   0.9981   0.9962   0.9978   0.9979
 
-CV &lt;- testingCV
+out of sample error rate=0.0033
+				   
+CV <- testingCV
 CV$Pred = testingCV$classe == predictionRF
-<span class="hl kwd">qplot</span>(accel_forearm_x, accel_forearm_y, col=Pred, data=CV)
+qplot(accel_forearm_x, accel_forearm_y, col=Pred, data=CV)
 
-Result: Comparing two models Random forest appear to perform <span class="hl kwd">well</span> (accuracy=0.9967) as compare to Decision <span class="hl kwd">tree</span> (accuracy=0.7466). Therefore, Random forest model was used <span class="hl kwa">for</span> final prediction. 
+Result: Comparing two models Random forest appear to perform well (accuracy=0.9967, out of sample error rate=0.0033) as compare to Decision tree (accuracy=0.7466, out of sample error rate=0.2534). Therefore, Random forest model was used for final prediction. 
 
-<span class="hl com"># Testing the model to predict 20 different test cases</span>
-Predict = <span class="hl kwd">predict</span>(modelRF, testing)
+# Testing the model to predict 20 different test cases
+Predict = predict(modelRF, testing)
 Predict
 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 
  B  A  B  A  A  E  D  B  A  A  B  C  B  A  E  E  A  B  B  B 
 Levels: A B C D E
-</pre></div>
-<div class="error"><pre class="knitr r">## Error: &lt;text&gt;:9:17: unexpected symbol
-## 8: 
-## 9: -------training data
-##                    ^
-</pre></div>
-</div></div>
 
